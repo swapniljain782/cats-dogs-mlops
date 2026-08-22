@@ -62,3 +62,43 @@ stages:
       md5: ec59d74da7a0c4af341c47b6297657ba.dir
       size: 1505482610
       nfiles: 2
+  train:
+    cmd: PYTHONPATH=. python src/models/train.py
+    deps:
+    - path: data/train
+      hash: md5
+      md5: 91b7bb2d36a79e999bc54ba383204b3a.dir
+      size: 12042655725
+      nfiles: 2
+    - path: data/val
+      hash: md5
+      md5: ec59d74da7a0c4af341c47b6297657ba.dir
+      size: 1505482610
+      nfiles: 2
+    - path: params.yaml
+      hash: md5
+      md5: 296f86f9e8eeaa858ba7f966ec58090f
+      size: 480
+    - path: src/models/cnn_model.py
+      hash: md5
+      md5: 169d2c35092e3efb0084c442f1872f1b
+      size: 3968
+    - path: src/models/train.py
+      hash: md5
+      md5: 7c31f9848860a3ca004faf778f3cf9d9
+      size: 8857
+    params:
+      params.yaml:
+        data.batch_size: 64
+        data.image_size: 224
+        model.early_stopping_patience: 5
+        model.epochs: 20
+        model.learning_rate: 0.001
+        model.reduce_lr_factor: 0.5
+        model.reduce_lr_patience: 3
+    outs:
+    - path: models/best_model
+      hash: md5
+      md5: 90ebecfee8cf5733bc635b40fb620ed2.dir
+      size: 17346916
+      nfiles: 5

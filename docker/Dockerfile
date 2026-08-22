@@ -37,6 +37,7 @@ COPY --from=builder /root/.local /home/appuser/.local
 COPY src/ ./src/
 COPY params.yaml ./
 COPY models/best_model/ ./models/best_model/
+COPY static/ ./static/
 
 # Set ownership
 RUN chown -R appuser:appuser /app

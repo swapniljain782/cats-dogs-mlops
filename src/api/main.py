@@ -2,10 +2,12 @@
 import time
 import uuid
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request, Response
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from src.utils.config import get_config
@@ -60,6 +62,11 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# Mount static files directory for the web UI
+STATIC_DIR = Path(__file__).parent.parent.parent / "static"
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.middleware("http")
@@ -197,9 +204,13 @@ async def metrics():
     return Response(content=get_metrics(), media_type=CONTENT_TYPE_LATEST)
 
 
-@app.get("/", tags=["Root"])
+@app.get("/", response_class=HTMLResponse, tags=["Root"])
 async def root():
-    """Root endpoint with API info."""
+    """Serve the web UI."""
+    index_path = STATIC_DIR / "index.html"
+    if index_path.exists():
+        return FileResponse(str(index_path), media_type="text/html")
+    # Fallback to JSON info if UI not available
     return {
         "name": "Cats vs Dogs Classification API",
         "version": "1.0.0",
@@ -209,7 +220,8 @@ async def root():
             "predict": "/predict",
             "predict_base64": "/predict/base64",
             "metrics": "/metrics",
-            "docs": "/docs"
+            "docs": "/docs",
+            "ui": "/"
         }
     }
 
