@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: mlops-cats-dogs
+
+resources:
+  - ../base
+
+namePrefix: ""
+nameSuffix: ""
+
+# Production values
+patches:
+  - target:
+      kind: Deployment
+      name: cats-dogs-api
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "WARNING"
+    patchType: json

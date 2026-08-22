@@ -1,0 +1,64 @@
+schema: '2.0'
+stages:
+  download:
+    cmd: PYTHONPATH=. python src/data/download.py
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 8467ce11580412ec0b77ca194007550a.dir
+      size: 848866410
+      nfiles: 24998
+  preprocess:
+    cmd: PYTHONPATH=. python src/data/preprocess.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 8467ce11580412ec0b77ca194007550a.dir
+      size: 848866410
+      nfiles: 24998
+    - path: params.yaml
+      hash: md5
+      md5: 296f86f9e8eeaa858ba7f966ec58090f
+      size: 480
+    - path: src/data/preprocess.py
+      hash: md5
+      md5: 771423604fbed89be039dfcaafd39215
+      size: 7187
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: a8d1cd5547b4d968a91b5280d762ba6d.dir
+      size: 15053620745
+      nfiles: 2
+  split:
+    cmd: PYTHONPATH=. python src/data/split.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: a8d1cd5547b4d968a91b5280d762ba6d.dir
+      size: 15053620745
+      nfiles: 2
+    - path: params.yaml
+      hash: md5
+      md5: 296f86f9e8eeaa858ba7f966ec58090f
+      size: 480
+    - path: src/data/split.py
+      hash: md5
+      md5: e3459f3bea1e97a7fcf9c358cbd7b0ae
+      size: 5269
+    outs:
+    - path: data/test
+      hash: md5
+      md5: f35df4846cd977e54733925d2b912269.dir
+      size: 1505482610
+      nfiles: 2
+    - path: data/train
+      hash: md5
+      md5: 91b7bb2d36a79e999bc54ba383204b3a.dir
+      size: 12042655725
+      nfiles: 2
+    - path: data/val
+      hash: md5
+      md5: ec59d74da7a0c4af341c47b6297657ba.dir
+      size: 1505482610
+      nfiles: 2

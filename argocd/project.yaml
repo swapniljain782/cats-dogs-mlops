@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cats-dogs-mlops
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Cats vs Dogs MLOps Pipeline - GitOps managed deployments
+  sourceRepos:
+    - "*"  # Allow from any repo (CI pushes images, K8s manifests in this repo)
+  destinations:
+    - namespace: mlops-cats-dogs
+      server: https://kubernetes.default.svc
+    - namespace: mlops-cats-dogs-staging
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: "*"
+    - group: apps
+      kind: "*"
+    - group: networking.k8s.io
+      kind: "*"
+  orphanedResources:
+    warn: true
+  roles:
+    - name: ci
+      description: CI pipeline role for image updates
+      policies:
+        - p, proj:cats-dogs-mlops:ci, applications, sync, cats-dogs-mlops/*, allow
+        - p, proj:cats-dogs-mlops:ci, applications, get, cats-dogs-mlops/*, allow
+      groups:
+        - ci-pipeline

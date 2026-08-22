@@ -1,0 +1,47 @@
+stages:
+  download:
+    cmd: PYTHONPATH=. python src/data/download.py
+    outs:
+      - data/raw:
+          cache: true
+  preprocess:
+    cmd: PYTHONPATH=. python src/data/preprocess.py
+    deps:
+      - data/raw
+      - src/data/preprocess.py
+      - params.yaml
+    outs:
+      - data/processed:
+          cache: true
+  split:
+    cmd: PYTHONPATH=. python src/data/split.py
+    deps:
+      - data/processed
+      - src/data/split.py
+      - params.yaml
+    outs:
+      - data/train:
+          cache: true
+      - data/val:
+          cache: true
+      - data/test:
+          cache: true
+  train:
+    cmd: PYTHONPATH=. python src/models/train.py
+    deps:
+      - data/train
+      - data/val
+      - src/models/train.py
+      - src/models/cnn_model.py
+      - params.yaml
+    outs:
+      - models/best_model:
+          cache: true
+    params:
+      - model.learning_rate
+      - model.epochs
+      - model.early_stopping_patience
+      - model.reduce_lr_patience
+      - model.reduce_lr_factor
+      - data.batch_size
+      - data.image_size

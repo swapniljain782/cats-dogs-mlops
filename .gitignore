@@ -1,0 +1,48 @@
+# Data and models (tracked by DVC)
+data/
+models/
+*.pkl
+*.h5
+*.keras
+*.pt
+
+# MLflow
+mlflow.db
+mlflow_artifacts/
+mlruns/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# Logs
+*.log
+logs/
+
+# Kubernetes
+kubeconfig

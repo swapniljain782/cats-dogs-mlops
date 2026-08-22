@@ -1,0 +1,62 @@
+# Git
+.git/
+.gitignore
+
+# DVC
+.dvc/
+.dvcignore
+data/
+
+# MLflow
+mlflow.db
+mlflow_artifacts/
+mlruns/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Tests
+tests/
+*.test.py
+
+# CI/CD
+.github/
+
+# Kubernetes
+k8s/
+
+# Documentation
+README.md
+*.md
+
+# Docker
+.docker/
+Dockerfile*
+docker-compose*

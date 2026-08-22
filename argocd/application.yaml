@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cats-dogs-api-production
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: cats-dogs-mlops
+    environment: production
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    # Auto-sync on Git changes
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: cats-dogs-mlops
+  source:
+    repoURL: ""  # Set to your Git repository URL
+    targetRevision: main
+    path: argocd/overlays/production
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mlops-cats-dogs
+  syncPolicy:
+    automated:
+      prune: true       # Delete resources removed from Git
+      selfHeal: true     # Revert manual changes in cluster
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ServerSideApply=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 1m
+  # Health checks
+  info:
+    - name: Description
+      value: "Cats vs Dogs Classification API - Production"
+    - name: Team
+      value: "MLOps"
+  ignoredDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas  # Allow autoscaler to manage replicas

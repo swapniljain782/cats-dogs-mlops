@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cats-dogs-api-staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: cats-dogs-mlops
+    environment: staging
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: cats-dogs-mlops
+  source:
+    repoURL: ""  # Set to your Git repository URL
+    targetRevision: develop
+    path: argocd/overlays/staging
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mlops-cats-dogs-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 1m
