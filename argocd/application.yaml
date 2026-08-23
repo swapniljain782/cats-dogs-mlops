@@ -14,7 +14,7 @@ metadata:
 spec:
   project: cats-dogs-mlops
   source:
-    repoURL: ""  # Set to your Git repository URL
+    repoURL: https://github.com/swapniljain782/cats-dogs-mlops.git
     targetRevision: main
     path: argocd/overlays/production
     helm:
@@ -45,7 +45,7 @@ spec:
       value: "Cats vs Dogs Classification API - Production"
     - name: Team
       value: "MLOps"
-  ignoredDifferences:
+  ignoreDifferences:
     - group: apps
       kind: Deployment
       jsonPointers:
