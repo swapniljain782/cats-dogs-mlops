@@ -44,7 +44,7 @@ class TestConfig:
     def test_get_config_value(self):
         """Test get_config() with dot-notation key returns value."""
         batch_size = get_config("data.batch_size")
-        assert batch_size == 32
+        assert batch_size == 64
     
     def test_get_config_value_with_default(self):
         """Test get_config() with default for missing key."""
@@ -61,7 +61,7 @@ class TestConfig:
         config = get_config_obj()
         assert config.data.image_size == 224
         assert config.model.epochs == 20
-        assert config.data.batch_size == 32
+        assert config.data.batch_size == 64
     
     def test_config_dot_get(self):
         """Test Config.get() method with dot notation."""

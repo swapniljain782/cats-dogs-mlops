@@ -27,13 +27,15 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: default
+      imagePullSecrets:
+        - name: ghcr-pull-secret
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
       containers:
         - name: cats-dogs-api
-          image: ghcr.io/username/cats-dogs-api:latest
+          image: ghcr.io/swapniljain782/cats-dogs-mlops:v1.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

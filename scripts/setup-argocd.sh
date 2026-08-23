@@ -30,8 +30,8 @@ log_info "Installing Argo CD (version: $ARGOCD_VERSION)..."
 # Create namespace
 kubectl create namespace $ARGOCD_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
-# Install Argo CD
-kubectl apply -n $ARGOCD_NAMESPACE -f https://raw.githubusercontent.com/argoproj/argo-cd/$ARGOCD_VERSION/manifests/install.yaml
+# Install Argo CD (server-side apply for large CRDs)
+kubectl apply -n $ARGOCD_NAMESPACE --server-side -f https://raw.githubusercontent.com/argoproj/argo-cd/$ARGOCD_VERSION/manifests/install.yaml
 
 # Wait for Argo CD to be ready
 log_info "Waiting for Argo CD server to be ready..."

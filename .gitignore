@@ -1,5 +1,5 @@
 # Data and models (tracked by DVC)
-data/
+/data/
 models/
 *.pkl
 *.h5
