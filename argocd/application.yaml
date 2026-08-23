@@ -16,10 +16,7 @@ spec:
   source:
     repoURL: https://github.com/swapniljain782/cats-dogs-mlops.git
     targetRevision: main
-    path: argocd/overlays/production
-    helm:
-      valueFiles:
-        - values.yaml
+    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: mlops-cats-dogs

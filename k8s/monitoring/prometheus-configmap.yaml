@@ -32,7 +32,7 @@ data:
             regex: cats-dogs-api
           - source_labels: [__meta_kubernetes_endpoint_port_name]
             action: keep
-            regex: metrics
+            regex: http
 
       - job_name: 'prometheus'
         static_configs:

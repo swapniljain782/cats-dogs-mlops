@@ -1,8 +1,13 @@
-.PHONY: help install install-dev dvc-init dvc-pull dvc-push dvc-repro train test lint build run clean argocd-install argocd-deploy argocd-status monitoring-up monitoring-down monitoring-k8s
+.PHONY: help all install install-dev dvc-init dvc-pull dvc-push dvc-repro train test lint build run clean argocd-install argocd-deploy argocd-status monitoring-up monitoring-down monitoring-k8s
+
+# Full setup: install, test, build, deploy
+all: install-dev test build
+	@echo "Setup complete. Run 'make deploy-kind' or 'make argocd-deploy' to deploy."
 
 # Default target
 help:
 	@echo "Available targets:"
+	@echo "  all            - Full setup: install, test, build"
 	@echo "  install        - Install production dependencies"
 	@echo "  install-dev    - Install development dependencies"
 	@echo "  dvc-init       - Initialize DVC"
@@ -62,6 +67,13 @@ run:
 
 mlflow-ui:
 	mlflow ui --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlflow_artifacts --host 0.0.0.0 --port 5000
+
+mlflow-up:
+	kubectl apply -f k8s/mlflow/mlflow.yaml
+	@echo "MLflow UI: http://localhost:30500"
+
+mlflow-down:
+	kubectl delete -f k8s/mlflow/mlflow.yaml
 
 # Argo CD targets
 argocd-install:

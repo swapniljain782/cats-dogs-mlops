@@ -20,5 +20,5 @@ model:
 
 mlflow:
   experiment_name: "cats-dogs-classification"
-  tracking_uri: "sqlite:///mlflow.db"
-  artifact_location: "mlflow_artifacts"
+  tracking_uri: "http://mlflow:5000"
+  artifact_location: "/mlflow/artifacts"
