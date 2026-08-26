@@ -11,14 +11,14 @@ data:
     brightness_range: [0.8, 1.2]
 
 model:
-  type: "cnn"
+  type: "mobilenetv2"
   learning_rate: 0.001
-  epochs: 20
-  early_stopping_patience: 5
-  reduce_lr_patience: 3
+  epochs: 10
+  early_stopping_patience: 3
+  reduce_lr_patience: 2
   reduce_lr_factor: 0.5
 
 mlflow:
   experiment_name: "cats-dogs-classification"
-  tracking_uri: "http://mlflow:5000"
+  tracking_uri: "http://localhost:5001"
   artifact_location: "/mlflow/artifacts"

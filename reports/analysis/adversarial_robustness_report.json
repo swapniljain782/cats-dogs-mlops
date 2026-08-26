@@ -1,0 +1,92 @@
+{
+  "summary": {
+    "clean_accuracy": 1.0,
+    "worst_case_accuracy": 0.0,
+    "robustness_ratio": 0.0,
+    "noise_robustness": {
+      "epsilon": 0.05,
+      "mean_accuracy": 0.9833333492279053,
+      "std_accuracy": 0.004714040712246475,
+      "num_runs": 3
+    },
+    "findings_count": 2,
+    "robustness_verdict": "FRAGILE"
+  },
+  "attack_results": {
+    "fgsm": [
+      {
+        "attack": "fgsm",
+        "epsilon": 0.01,
+        "accuracy": 0.44999998807907104,
+        "mean_confidence": 0.8958307504653931,
+        "prediction_flip_rate": 0.55
+      },
+      {
+        "attack": "fgsm",
+        "epsilon": 0.1,
+        "accuracy": 0.5699999928474426,
+        "mean_confidence": 0.9421323537826538,
+        "prediction_flip_rate": 0.43
+      }
+    ],
+    "pgd": [
+      {
+        "attack": "pgd",
+        "epsilon": 0.01,
+        "accuracy": 0.0,
+        "mean_confidence": 0.998382031917572,
+        "prediction_flip_rate": 1.0
+      },
+      {
+        "attack": "pgd",
+        "epsilon": 0.1,
+        "accuracy": 0.0,
+        "mean_confidence": 0.9999585151672363,
+        "prediction_flip_rate": 1.0
+      }
+    ],
+    "random_noise": [
+      {
+        "attack": "random_noise",
+        "epsilon": 0.01,
+        "accuracy": 1.0,
+        "mean_confidence": 0.9911916851997375,
+        "prediction_flip_rate": 0.0
+      },
+      {
+        "attack": "random_noise",
+        "epsilon": 0.1,
+        "accuracy": 0.9700000286102295,
+        "mean_confidence": 0.9880573153495789,
+        "prediction_flip_rate": 0.03
+      }
+    ]
+  },
+  "noise_robustness": {
+    "epsilon": 0.05,
+    "mean_accuracy": 0.9833333492279053,
+    "std_accuracy": 0.004714040712246475,
+    "num_runs": 3
+  },
+  "robustness_findings": [
+    {
+      "attack": "fgsm",
+      "epsilon": 0.01,
+      "accuracy": 0.44999998807907104,
+      "severity": "HIGH",
+      "finding": "Model accuracy drops below 50% at epsilon=0.01"
+    },
+    {
+      "attack": "pgd",
+      "epsilon": 0.01,
+      "accuracy": 0.0,
+      "severity": "HIGH",
+      "finding": "Model accuracy drops below 50% at epsilon=0.01"
+    }
+  ],
+  "epsilons_tested": [
+    0.01,
+    0.1
+  ],
+  "num_samples_tested": 100
+}

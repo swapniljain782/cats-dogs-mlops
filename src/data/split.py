@@ -17,7 +17,7 @@ def parse_tfrecord(example_proto, image_size):
         "label": tf.io.FixedLenFeature([], tf.int64),
     }
     example = tf.io.parse_single_example(example_proto, feature_description)
-    image = tf.io.parse_tensor(example["image"], out_type=tf.float32)
+    image = tf.io.decode_raw(example["image"], tf.float32)
     image = tf.reshape(image, (*image_size, 3))
     label = example["label"]
     return image, label
@@ -34,7 +34,7 @@ def load_dataset_from_tfrecord(tfrecord_path: Path, image_size: tuple) -> tf.dat
 
 
 def split_dataset():
-    """Split processed dataset into train/val/test."""
+    """Split processed dataset into train/val/test (memory-efficient)."""
     config = get_config()
     
     processed_dir = Path("data/processed")
@@ -50,86 +50,54 @@ def split_dataset():
     num_samples = metadata["num_samples"]
     image_size = tuple(metadata["image_size"])
     
-    # Load all data to split
-    dataset = load_dataset_from_tfrecord(tfrecord_path, image_size)
-    
-    # Convert to numpy arrays for splitting
-    images = []
-    labels = []
-    for img, lbl in dataset:
-        images.append(img.numpy())
-        labels.append(lbl.numpy())
-    
-    images = np.array(images)
-    labels = np.array(labels)
-    
-    logger.info(f"Loaded {len(images)} samples for splitting")
-    
-    # Split ratios
     train_split = config.data.train_split
     val_split = config.data.val_split
-    test_split = config.data.test_split
     
-    # First split: train vs (val + test)
-    train_images, temp_images, train_labels, temp_labels = train_test_split(
-        images, labels,
-        train_size=train_split,
-        stratify=labels,
-        random_state=42
-    )
-    
-    # Second split: val vs test
-    val_ratio = val_split / (val_split + test_split)
-    val_images, test_images, val_labels, test_labels = train_test_split(
-        temp_images, temp_labels,
-        train_size=val_ratio,
-        stratify=temp_labels,
-        random_state=42
-    )
-    
-    logger.info(f"Split sizes - Train: {len(train_images)}, Val: {len(val_images)}, Test: {len(test_images)}")
-    
-    # Save splits as TFRecords
     output_dirs = {
         "train": Path("data/train"),
         "val": Path("data/val"),
         "test": Path("data/test")
     }
+    for d in output_dirs.values():
+        d.mkdir(parents=True, exist_ok=True)
     
-    splits = {
-        "train": (train_images, train_labels),
-        "val": (val_images, val_labels),
-        "test": (test_images, test_labels)
+    writers = {
+        "train": tf.io.TFRecordWriter(str(output_dirs["train"] / "dataset.tfrecord")),
+        "val": tf.io.TFRecordWriter(str(output_dirs["val"] / "dataset.tfrecord")),
+        "test": tf.io.TFRecordWriter(str(output_dirs["test"] / "dataset.tfrecord")),
     }
     
-    for split_name, (split_images, split_labels) in splits.items():
-        output_dir = output_dirs[split_name]
-        output_dir.mkdir(parents=True, exist_ok=True)
+    counts = {"train": 0, "val": 0, "test": 0}
+    
+    raw_dataset = tf.data.TFRecordDataset(str(tfrecord_path))
+    
+    for i, raw_record in enumerate(raw_dataset):
+        r = hash(str(i)) % 10000 / 10000.0
+        if r < train_split:
+            split = "train"
+        elif r < train_split + val_split:
+            split = "val"
+        else:
+            split = "test"
+        writers[split].write(raw_record.numpy())
+        counts[split] += 1
         
-        tfrecord_out = output_dir / "dataset.tfrecord"
-        
-        def serialize_example(image, label):
-            feature = {
-                "image": tf.train.Feature(bytes_list=tf.train.BytesList(
-                    value=[tf.io.serialize_tensor(tf.convert_to_tensor(image)).numpy()])),
-                "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[int(label)])),
-            }
-            return tf.train.Example(features=tf.train.Features(feature=feature)).SerializeToString()
-        
-        with tf.io.TFRecordWriter(str(tfrecord_out)) as writer:
-            for img, lbl in zip(split_images, split_labels):
-                writer.write(serialize_example(img, lbl))
-        
-        # Save split metadata
+        if (i + 1) % 5000 == 0:
+            logger.info(f"Split progress: {i + 1}/{num_samples}")
+    
+    for w in writers.values():
+        w.close()
+    
+    logger.info(f"Split complete - Train: {counts['train']}, Val: {counts['val']}, Test: {counts['test']}")
+    
+    for split_name in ["train", "val", "test"]:
         split_metadata = {
-            "num_samples": len(split_images),
+            "num_samples": counts[split_name],
             "image_size": list(image_size),
             "class_names": metadata["class_names"]
         }
-        with open(output_dir / "metadata.json", "w") as f:
+        with open(output_dirs[split_name] / "metadata.json", "w") as f:
             json.dump(split_metadata, f, indent=2)
-        
-        logger.info(f"Saved {split_name} split to {output_dir} ({len(split_images)} samples)")
 
 
 def get_split_dataset(split: str, batch_size: int = None, shuffle: bool = True) -> tf.data.Dataset:

@@ -1,0 +1,112 @@
+{
+  "summary": {
+    "num_features_tested": 9,
+    "num_drifted": 1,
+    "drift_percentage": 11.11111111111111,
+    "max_psi": 0.0744993740392907,
+    "overall_drift_status": "NONE"
+  },
+  "feature_results": {
+    "red_mean": {
+      "psi": 0.0375926062976299,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.033,
+        "p_value": 0.647814872077161,
+        "drift_detected": false
+      },
+      "wasserstein_distance": 0.004687358081340789
+    },
+    "red_std": {
+      "psi": 0.0320086244799485,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.027,
+        "p_value": 0.8595454206943325,
+        "drift_detected": false
+      },
+      "wasserstein_distance": 0.0015775481611490251
+    },
+    "green_mean": {
+      "psi": 0.0456803501317545,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.042,
+        "p_value": 0.34112475112661245,
+        "drift_detected": false
+      },
+      "wasserstein_distance": 0.00665303196758032
+    },
+    "green_std": {
+      "psi": 0.02305884061685225,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.021,
+        "p_value": 0.9802627322900355,
+        "drift_detected": false
+      },
+      "wasserstein_distance": 0.0015245798751711845
+    },
+    "blue_mean": {
+      "psi": 0.02007801597524745,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.032,
+        "p_value": 0.6854967337920594,
+        "drift_detected": false
+      },
+      "wasserstein_distance": 0.004894857086241247
+    },
+    "blue_std": {
+      "psi": 0.01960660014160111,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.025,
+        "p_value": 0.9136894237272155,
+        "drift_detected": false
+      },
+      "wasserstein_distance": 0.0014565504193305974
+    },
+    "brightness": {
+      "psi": 0.06405160835888508,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.037,
+        "p_value": 0.5005673707894058,
+        "drift_detected": false
+      },
+      "wasserstein_distance": 0.0054461750239133844
+    },
+    "contrast": {
+      "psi": 0.018924758280876874,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.021,
+        "p_value": 0.9802627322900355,
+        "drift_detected": false
+      },
+      "wasserstein_distance": 0.0017114074826240536
+    },
+    "edge_density": {
+      "psi": 0.0744993740392907,
+      "psi_severity": "none",
+      "ks_test": {
+        "statistic": 0.089,
+        "p_value": 0.0007213629171338913,
+        "drift_detected": true
+      },
+      "wasserstein_distance": 0.0030118214730173354
+    }
+  },
+  "drift_findings": [
+    {
+      "feature": "edge_density",
+      "psi": 0.0744993740392907,
+      "ks_p_value": 0.0007213629171338913,
+      "wasserstein_distance": 0.0030118214730173354,
+      "severity": "MEDIUM"
+    }
+  ],
+  "train_samples": 1000,
+  "test_samples": 1000
+}

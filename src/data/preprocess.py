@@ -47,7 +47,8 @@ def create_augmentation_pipeline(
     
     if brightness_range:
         layers.append(tf.keras.layers.RandomBrightness(
-            factor=(brightness_range[0] - 1.0, brightness_range[1] - 1.0)
+            factor=(brightness_range[0] - 1.0, brightness_range[1] - 1.0),
+            value_range=(0.0, 1.0)
         ))
     
     return tf.keras.Sequential(layers) if layers else None
@@ -136,63 +137,87 @@ def create_tf_dataset(
 
 
 def preprocess_dataset(raw_data_dir: Path, output_dir: Path) -> None:
-    """Preprocess raw dataset and save as processed."""
+    """Preprocess raw dataset and split directly into train/val/test TFRecords."""
     config = get_config()
     
     image_size = (config.data.image_size, config.data.image_size)
     batch_size = config.data.batch_size
     
-    aug_config = config.data.augmentation
-    augmentation_pipeline = create_augmentation_pipeline(
-        rotation_range=aug_config.rotation_range,
-        zoom_range=aug_config.zoom_range,
-        horizontal_flip=aug_config.horizontal_flip,
-        brightness_range=tuple(aug_config.brightness_range)
-    )
-    
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
     # Get all image paths and labels
     image_paths, labels = get_image_paths_and_labels(raw_data_dir)
+    num_samples = len(image_paths)
     
-    # Create TF dataset with augmentation
-    dataset = create_tf_dataset(
-        image_paths=image_paths,
-        labels=labels,
-        batch_size=batch_size,
-        image_size=image_size,
-        shuffle=True,
-        augment=True,
-        augmentation_pipeline=augmentation_pipeline
-    )
+    # Shuffle and split indices
+    indices = np.arange(num_samples)
+    np.random.seed(42)
+    np.random.shuffle(indices)
     
-    # Save as TFRecord for efficient loading
-    tfrecord_path = output_dir / "dataset.tfrecord"
-    logger.info(f"Saving preprocessed dataset to {tfrecord_path}")
+    train_end = int(num_samples * config.data.train_split)
+    val_end = train_end + int(num_samples * config.data.val_split)
+    
+    split_indices = {
+        "train": indices[:train_end],
+        "val": indices[train_end:val_end],
+        "test": indices[val_end:],
+    }
+    
+    # Ensure output dirs exist
+    for split_name in split_indices:
+        (output_dir / split_name).mkdir(parents=True, exist_ok=True)
+    
+    writers = {
+        name: tf.io.TFRecordWriter(str(output_dir / name / "dataset.tfrecord"))
+        for name in split_indices
+    }
+    
+    counts = {name: 0 for name in split_indices}
     
     def serialize_example(image, label):
+        raw_bytes = image.numpy().astype(np.float32).tobytes()
         feature = {
-            "image": tf.train.Feature(bytes_list=tf.train.BytesList(
-                value=[tf.io.serialize_tensor(image).numpy()])),
-            "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[label.numpy()])),
+            "image": tf.train.Feature(bytes_list=tf.train.BytesList(value=[raw_bytes])),
+            "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[int(label.numpy())])),
         }
         return tf.train.Example(features=tf.train.Features(feature=feature)).SerializeToString()
     
-    with tf.io.TFRecordWriter(str(tfrecord_path)) as writer:
-        for batch_images, batch_labels in dataset:
-            for img, lbl in zip(batch_images, batch_labels):
-                writer.write(serialize_example(img, lbl))
+    # Process images without augmentation for efficiency
+    for i, (idx, path, label) in enumerate(zip(indices, [image_paths[j] for j in indices], [labels[j] for j in indices])):
+        try:
+            img = Image.open(path).convert("RGB")
+            img = img.resize(image_size, Image.Resampling.LANCZOS)
+            img_array = np.array(img, dtype=np.float32) / 255.0
+            
+            split_name = "train" if i < train_end else ("val" if i < val_end else "test")
+            
+            feature = {
+                "image": tf.train.Feature(bytes_list=tf.train.BytesList(value=[img_array.tobytes()])),
+                "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),
+            }
+            ex = tf.train.Example(features=tf.train.Features(feature=feature))
+            writers[split_name].write(ex.SerializeToString())
+            counts[split_name] += 1
+        except Exception as e:
+            logger.warning(f"Skipping corrupted image {path}: {e}")
+            continue
+        
+        if (i + 1) % 5000 == 0:
+            logger.info(f"Progress: {i + 1}/{num_samples}")
     
-    # Save metadata
-    import json
-    metadata = {
-        "num_samples": len(image_paths),
-        "num_classes": len(set(labels)),
-        "image_size": list(image_size),
-        "class_names": sorted([d.name for d in raw_data_dir.iterdir() if d.is_dir()])
-    }
-    with open(output_dir / "metadata.json", "w") as f:
-        json.dump(metadata, f, indent=2)
+    for w in writers.values():
+        w.close()
+    
+    # Save metadata for each split
+    class_names = sorted([d.name for d in raw_data_dir.iterdir() if d.is_dir()])
+    for split_name in split_indices:
+        metadata = {
+            "num_samples": counts[split_name],
+            "image_size": list(image_size),
+            "class_names": class_names,
+        }
+        with open(output_dir / split_name / "metadata.json", "w") as f:
+            json.dump(metadata, f, indent=2)
+    
+    logger.info(f"Done - Train: {counts['train']}, Val: {counts['val']}, Test: {counts['test']}")
     
     logger.info(f"Preprocessing complete. Saved {len(image_paths)} samples.")
 
@@ -201,8 +226,8 @@ def main():
     """Main entry point for DVC stage."""
     config = get_config()
     raw_dir = Path("data/raw/PetImages")
-    processed_dir = Path("data/processed")
-    preprocess_dataset(raw_dir, processed_dir)
+    output_dir = Path("data")
+    preprocess_dataset(raw_dir, output_dir)
 
 
 if __name__ == "__main__":

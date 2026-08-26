@@ -1,0 +1,173 @@
+{
+  "results": {
+    "overall": {
+      "count": 2501,
+      "accuracy": 0.9848060775689724,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9887820512820513,
+          "recall": 1.0,
+          "support": 1248
+        },
+        "Dog": {
+          "precision": 0.9808459696727854,
+          "recall": 1.0,
+          "support": 1253
+        }
+      }
+    },
+    "brightness_low": {
+      "count": 826,
+      "accuracy": 0.9854721549636803,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9863325740318907,
+          "recall": 1.0,
+          "support": 439
+        },
+        "Dog": {
+          "precision": 0.9844961240310077,
+          "recall": 1.0,
+          "support": 387
+        }
+      }
+    },
+    "brightness_medium": {
+      "count": 825,
+      "accuracy": 0.9818181818181818,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9845758354755784,
+          "recall": 1.0,
+          "support": 389
+        },
+        "Dog": {
+          "precision": 0.9793577981651376,
+          "recall": 1.0,
+          "support": 436
+        }
+      }
+    },
+    "brightness_high": {
+      "count": 850,
+      "accuracy": 0.9870588235294118,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9952380952380953,
+          "recall": 1.0,
+          "support": 420
+        },
+        "Dog": {
+          "precision": 0.9790697674418605,
+          "recall": 1.0,
+          "support": 430
+        }
+      }
+    },
+    "saturation_low": {
+      "count": 826,
+      "accuracy": 0.9842615012106537,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9912854030501089,
+          "recall": 1.0,
+          "support": 459
+        },
+        "Dog": {
+          "precision": 0.9754768392370572,
+          "recall": 1.0,
+          "support": 367
+        }
+      }
+    },
+    "saturation_medium": {
+      "count": 825,
+      "accuracy": 0.9878787878787879,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9927007299270073,
+          "recall": 1.0,
+          "support": 411
+        },
+        "Dog": {
+          "precision": 0.9830917874396136,
+          "recall": 1.0,
+          "support": 414
+        }
+      }
+    },
+    "saturation_high": {
+      "count": 850,
+      "accuracy": 0.9823529411764705,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9814814814814815,
+          "recall": 1.0,
+          "support": 378
+        },
+        "Dog": {
+          "precision": 0.9830508474576272,
+          "recall": 1.0,
+          "support": 472
+        }
+      }
+    },
+    "color_temp_cool": {
+      "count": 826,
+      "accuracy": 0.9806295399515739,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9886877828054299,
+          "recall": 1.0,
+          "support": 442
+        },
+        "Dog": {
+          "precision": 0.9713541666666666,
+          "recall": 1.0,
+          "support": 384
+        }
+      }
+    },
+    "color_temp_neutral": {
+      "count": 825,
+      "accuracy": 0.9878787878787879,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9903381642512077,
+          "recall": 1.0,
+          "support": 414
+        },
+        "Dog": {
+          "precision": 0.9854014598540146,
+          "recall": 1.0,
+          "support": 411
+        }
+      }
+    },
+    "color_temp_warm": {
+      "count": 850,
+      "accuracy": 0.9858823529411764,
+      "per_class": {
+        "Cat": {
+          "precision": 0.9872448979591837,
+          "recall": 1.0,
+          "support": 392
+        },
+        "Dog": {
+          "precision": 0.9847161572052402,
+          "recall": 1.0,
+          "support": 458
+        }
+      }
+    }
+  },
+  "fairness_metrics": {
+    "accuracy_range": 0.007249247927214042,
+    "accuracy_std": 0.0024134077922429546,
+    "min_accuracy": 0.9806295399515739,
+    "max_accuracy": 0.9878787878787879,
+    "num_subgroups_analyzed": 10,
+    "bias_findings_count": 0
+  },
+  "bias_findings": []
+}
