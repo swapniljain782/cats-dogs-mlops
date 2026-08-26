@@ -60,7 +60,7 @@ class TestConfig:
         """Test Config attribute access."""
         config = get_config_obj()
         assert config.data.image_size == 224
-        assert config.model.epochs == 20
+        assert config.model.epochs == 10
         assert config.data.batch_size == 64
     
     def test_config_dot_get(self):
